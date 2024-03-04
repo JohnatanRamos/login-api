@@ -4,7 +4,7 @@ import { Model } from 'mongoose';
 import { User } from '../entities/user.entity';
 import { IRequestResponse } from 'src/shared/interfaces/IRequestResponse.interface';
 import { buildResponseSuccess } from 'src/shared/utils/Response.util';
-import { encrypt } from 'src/shared/functions/encryptPassword.function';
+import { encrypt, comparePassword } from 'src/shared/functions/encryptPassword.function';
 import { IUser } from '../interfaces/IUser.interface';
 
 @Injectable()
@@ -100,5 +100,38 @@ export class UserService {
    */
   private async findUser(objSearch: any): Promise<{ _id }> {
     return this.userModel.findOne(objSearch);
+  }
+
+  async changePassword({currentPassword, newPassword, idUser}) {
+    const user = await this.userModel.findById(idUser);
+
+    if (!user) {
+      throw new HttpException(
+        'The user does not exist.',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
+    const correctPassword = await comparePassword(currentPassword, user.password);
+
+    if (!correctPassword) {
+      throw new HttpException(
+        'The password does not match.',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
+    const PASSWORD = await encrypt(newPassword);
+
+    await this.userModel.findByIdAndUpdate(idUser, {
+      $set: {
+        password: PASSWORD
+      }
+    });
+
+    return buildResponseSuccess({
+      data: true,
+      msg: "The password change was successful."
+    });
   }
 }
