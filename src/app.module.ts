@@ -5,7 +5,8 @@ import { DatabaseModule } from './database/database.module';
 import { ConfigModule } from '@nestjs/config';
 import { enviroments } from './enviroments';
 import configuration from './config'; 
-import { AuthModule } from './modules/auth/auth.module';
+import { UserModule } from './user/user.module';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
   imports: [
@@ -15,6 +16,7 @@ import { AuthModule } from './modules/auth/auth.module';
       isGlobal: true,
     }),
     DatabaseModule,
+    UserModule,
     AuthModule
   ],
   controllers: [AppController],

@@ -98,7 +98,7 @@ export class UserService {
    * @param {any} objSearch - Objection to search.
    * @returns {Promise<{_id}>} - A _id if the user exists.
    */
-  private async findUser(objSearch: any): Promise<{ _id }> {
+  async findUser(objSearch: any): Promise<IUser> {
     return this.userModel.findOne(objSearch);
   }
 

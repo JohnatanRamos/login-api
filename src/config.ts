@@ -8,5 +8,6 @@ export default registerAs('configuration', () => {
       db: process.env.MONGO_DB,
       cluster: process.env.MONGO_CLUSTER,
     },
+    jwtSecret: process.env.JWT_SECRET
   };
 });

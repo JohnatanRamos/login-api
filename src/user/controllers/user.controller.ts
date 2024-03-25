@@ -1,15 +1,19 @@
-import { Body, Controller, Get, Param, Patch, Post, Put, UseFilters } from '@nestjs/common';
-import { HttpExceptionFilter } from 'src/core/filters/http-exception.filter';
+import { Body, Controller, Get, Param, Patch, Post, Put, UseFilters, UseGuards } from '@nestjs/common';
+import { HttpExceptionFilter } from 'src/shared/filters/http-exception.filter';
 import { UserService } from '../services/user.service';
 import { CreateUserDto } from '../dto/create-user.dto';
 import { UpdateUserDto } from '../dto/update-user.dto';
 import { UpdatePasswordDto } from '../dto/update-password.dto';
+import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
+import { Public } from 'src/auth/decorators/public.decorator';
 
 @UseFilters(HttpExceptionFilter)
+@UseGuards(JwtAuthGuard)
 @Controller('user')
 export class UserController {
   constructor(private userService: UserService) {}
 
+  @Public()
   @Get()
   getUsers() {
     return this.userService.getAllUsers();
