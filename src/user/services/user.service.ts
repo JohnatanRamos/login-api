@@ -1,17 +1,25 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
+import { JwtService } from '@nestjs/jwt';
+import { ConfigType } from '@nestjs/config';
+
 import { User } from '../entities/user.entity';
 import { IRequestResponse } from 'src/shared/interfaces/IRequestResponse.interface';
 import { buildResponseSuccess } from 'src/shared/utils/Response.util';
 import { encrypt, comparePassword } from 'src/shared/functions/encryptPassword.function';
 import { IUser } from '../interfaces/IUser.interface';
+import { EmailService } from 'src/shared/services/email.service';
+import configuration from '../../config';
 
 @Injectable()
 export class UserService {
   constructor(
     @InjectModel(User.name)
     private readonly userModel: Model<User>,
+    private emailService: EmailService,
+    @Inject(configuration.KEY) private config: ConfigType<typeof configuration>,
+    private jwtService: JwtService,
   ) {}
 
   /**
@@ -133,5 +141,53 @@ export class UserService {
       data: true,
       msg: "The password change was successful."
     });
+  }
+
+  /**
+   * Send email for reseting password.
+   * @param email Verificate the email.
+   */
+  async sendEmailRecoverPassword(email: string) {
+    const user = await this.findUser({email});
+    if (!user) {
+      throw new NotFoundException({
+        customMessage: 'El email no existe',
+        tag: 'ErrorEmailNotFound',
+      });
+    }
+    const token = this.generateTokenPassword(user);
+    const urlLogin = this.config.appUrls.urlChangePassword;
+    const data = {
+      ...user,
+      link: `${urlLogin}?token=${token}`,
+    };
+  
+    const configEmail = {
+      subject: 'Cambio de contraseña',
+      from: 'Billar la ramada',
+      to: user.email,
+    };
+    const res = await this.emailService.sendMail(
+      configEmail,
+      data,
+      'forgot-password',
+    );
+    return buildResponseSuccess({
+      data: res ?? 'The mail was send successfully',
+    });
+  }
+
+  /**
+   * Generate token for changing password.
+   */
+  generateTokenPassword(user: IUser) {
+    const token = this.jwtService.sign(
+      { sub: user._id },
+      {
+        secret: this.config.tokens.jwtSecretRecoverPassword,
+        expiresIn: '20min',
+      },
+    );
+    return token;
   }
 }

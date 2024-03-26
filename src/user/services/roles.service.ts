@@ -11,10 +11,6 @@ export class RolesService {
   ) {}
 
   async findAll() {
-    try {
-      return this.roleModel.find();
-    } catch (error) {
-      console.log(error);
-    }
+    return await this.roleModel.find();
   }
 }

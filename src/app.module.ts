@@ -7,6 +7,7 @@ import { enviroments } from './enviroments';
 import configuration from './config'; 
 import { UserModule } from './user/user.module';
 import { AuthModule } from './auth/auth.module';
+import { SharedModule } from './shared/shared.module';
 
 @Module({
   imports: [
@@ -16,6 +17,7 @@ import { AuthModule } from './auth/auth.module';
       isGlobal: true,
     }),
     DatabaseModule,
+    SharedModule,
     UserModule,
     AuthModule
   ],

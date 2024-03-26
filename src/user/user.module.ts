@@ -5,12 +5,15 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { User, UserSchema } from './entities/user.entity';
 import { RolesService } from './services/roles.service';
 import { Role, RoleSchema } from './entities/role.entity';
+import { JwtModule } from '@nestjs/jwt';
 
 @Module({
     imports: [MongooseModule.forFeature([
         { name: User.name, schema: UserSchema },
         { name: Role.name, schema: RoleSchema }
-    ])],
+    ]),
+    JwtModule
+    ],
     controllers: [UserController],
     providers: [UserService, RolesService],
     exports: [UserService]

@@ -18,7 +18,7 @@ import { UserModule } from 'src/user/user.module';
       inject: [config.KEY],
       useFactory: (configService: ConfigType<typeof config>) => {
         return {
-          secret: configService.jwtSecret,
+          secret: configService.tokens.jwtSecret,
           signOptions: {
             expiresIn: '1h',
           },

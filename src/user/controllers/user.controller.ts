@@ -33,4 +33,13 @@ export class UserController {
   changePassword(@Body() body: UpdatePasswordDto, @Param('id') idUser: string) {
     return this.userService.changePassword({...body, idUser});
   }
+
+  /**
+   * Controller of the method send mail when forgots password.
+   */
+  @Public()
+  @Post('forgot-password')
+  async forgotPassword(@Body('email') email: string) {
+    return this.userService.sendEmailRecoverPassword(email);
+  }
 }
