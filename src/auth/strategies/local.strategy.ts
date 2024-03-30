@@ -20,6 +20,8 @@ export class LocalStrategy extends PassportStrategy(Strategy, 'local') {
         tag: 'ErrorInvalidCredentials',
       });
     }
+    delete user.password;
+    
     return user;
   }
 }

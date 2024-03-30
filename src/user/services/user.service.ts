@@ -11,6 +11,7 @@ import { encrypt, comparePassword } from 'src/shared/functions/encryptPassword.f
 import { IUser } from '../interfaces/IUser.interface';
 import { EmailService } from 'src/shared/services/email.service';
 import configuration from '../../config';
+import { IPayloadToken } from 'src/auth/interface/IPayloadToken.interface';
 
 @Injectable()
 export class UserService {
@@ -189,5 +190,25 @@ export class UserService {
       },
     );
     return token;
+  }
+
+  /**
+   * Change password when user forgot it.
+   * @param password New password.
+   * @param token
+   */
+  async recoveryPassword(password: string, token: string) {
+    const payload: IPayloadToken = this.jwtService.verify(token, {
+      secret: this.config.tokens.jwtSecretRecoverPassword,
+      ignoreExpiration: false
+    });
+    const hasPassword = await encrypt(password);
+    await this.userModel.findByIdAndUpdate(payload.sub, {
+      password: hasPassword,
+    });
+
+    return buildResponseSuccess({
+      data: 'The password was change succesful',
+    });
   }
 }

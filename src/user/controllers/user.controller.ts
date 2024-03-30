@@ -6,6 +6,7 @@ import { UpdateUserDto } from '../dto/update-user.dto';
 import { UpdatePasswordDto } from '../dto/update-password.dto';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { Public } from 'src/auth/decorators/public.decorator';
+import { RecoveryPasswordDto } from '../dto/recoveryPassword.dto';
 
 @UseFilters(HttpExceptionFilter)
 @UseGuards(JwtAuthGuard)
@@ -41,5 +42,14 @@ export class UserController {
   @Post('forgot-password')
   async forgotPassword(@Body('email') email: string) {
     return this.userService.sendEmailRecoverPassword(email);
+  }
+
+  /**
+   * Controller of the method recovery password.
+   */
+  @Public()
+  @Post('recovery-password')
+  async recoveryPassword(@Body() body: RecoveryPasswordDto) {
+    return this.userService.recoveryPassword(body.password, body.token);
   }
 }
