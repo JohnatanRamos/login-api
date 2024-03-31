@@ -4,6 +4,7 @@
 
 # Enviroments
 dev.env
+*.env
 
 # Logs
 logs
