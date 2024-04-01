@@ -3,7 +3,6 @@
 /node_modules
 
 # Enviroments
-dev.env
 *.env
 
 # Logs
